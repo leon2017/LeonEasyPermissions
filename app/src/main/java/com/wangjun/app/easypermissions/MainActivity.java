@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(MainActivity.this, permissionEnum.toString() + " -----是否被允许------ [" + granted + "]", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.ask_multi_permission:
-                askMtutiPermission();
+                askMultiPermission();
                 break;
             case R.id.ask_one_permission:
                 askSinglePermission();
@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /**
      * 多个权限的检查
      */
-    private void askMtutiPermission() {
+    private void askMultiPermission() {
         PermissionManager.with(MainActivity.this)
                 .key(800)
                 .permission(PermissionEnum.GET_ACCOUNTS, PermissionEnum.ACCESS_FINE_LOCATION, PermissionEnum.READ_SMS)
