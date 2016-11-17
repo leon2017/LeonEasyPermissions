@@ -1,5 +1,6 @@
 package com.wangjun.app.easypermissionslibrary.permission;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -22,6 +23,7 @@ import java.util.Collections;
  */
 public class PermissionManager {
 
+    @SuppressLint("StaticFieldLeak")
     private static PermissionManager instance;
 
     private Context context;
@@ -213,7 +215,7 @@ public class PermissionManager {
         if (context == null) {
             return;
         }
-        AlertDialog alertDialog = new AlertDialog.Builder(context)
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(context)
                 .setMessage(String.format(context.getResources().getString(R.string.permission_explain), msgCN.toString()))
                 .setPositiveButton(R.string.per_setting, new DialogInterface.OnClickListener() {
                     @Override
@@ -226,7 +228,7 @@ public class PermissionManager {
                     public void onClick(DialogInterface dialog, int which) {
                         fullCallback.deniedCancle(permissionsDenied);
                     }
-                }).create();
+                });
         alertDialog.show();
     }
 

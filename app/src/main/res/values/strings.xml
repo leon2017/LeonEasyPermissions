@@ -9,4 +9,6 @@
     <string name="permission_record_rationale">允许该权限可以给你炫酷的播放特效</string>
     <string name="permission_record_rationale_again">拒绝改该权限你将无法看到炫酷的播放特效</string>
     <string name="permission_record_denied">你已拒绝该权限,请前往设置中心打开权限</string>
+
+    <string name="action_fragment">Fragment</string>
 </resources>

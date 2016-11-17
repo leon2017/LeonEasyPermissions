@@ -1,15 +1,15 @@
 package com.wangjun.app.easypermissions;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -21,32 +21,37 @@ import com.wangjun.app.easypermissionslibrary.permission.PermissionManager;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+/**
+ * 当前类注释：permission for fragment
+ * Author :LeonWang
+ * Created  2016/11/17.9:23
+ * Description:
+ * E-mail:lijiawangjun@gmail.com
+ */
 
-    private Context mContext;
+public class SampleFragment extends Fragment implements View.OnClickListener{
+
     private Button askonepermission;
     private Button askmultipermission;
     private Button checkpermission;
+    private Context mContext;
 
+    @SuppressLint("InflateParams")
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        mContext = this;
-        this.checkpermission = (Button) findViewById(R.id.check_permission);
-        this.askmultipermission = (Button) findViewById(R.id.ask_multi_permission);
-        this.askonepermission = (Button) findViewById(R.id.ask_one_permission);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+       View view = inflater.inflate(R.layout.sample_fragment,null);
+
+        mContext = getActivity();
+        checkpermission = (Button) view.findViewById(R.id.check_permission);
+        askmultipermission = (Button) view.findViewById(R.id.ask_multi_permission);
+        askonepermission = (Button) view.findViewById(R.id.ask_one_permission);
 
         this.checkpermission.setOnClickListener(this);
         this.askmultipermission.setOnClickListener(this);
         this.askonepermission.setOnClickListener(this);
-    }
 
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        PermissionManager.handleResult(requestCode, permissions, grantResults);
+        return view;
     }
 
     @Override
@@ -54,8 +59,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.check_permission:
                 PermissionEnum permissionEnum = PermissionEnum.WRITE_EXTERNAL_STORAGE;
-                boolean granted = PermissionHelper.isGranted(MainActivity.this, PermissionEnum.WRITE_EXTERNAL_STORAGE);
-                Toast.makeText(MainActivity.this, permissionEnum.toString() + " -----是否被允许------ [" + granted + "]", Toast.LENGTH_SHORT).show();
+                boolean granted = PermissionHelper.isGranted(mContext, PermissionEnum.WRITE_EXTERNAL_STORAGE);
+                Toast.makeText(mContext, permissionEnum.toString() + " -----是否被允许------ [" + granted + "]", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.ask_multi_permission:
                 askMultiPermission();
@@ -66,13 +71,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-
     /**
      * 单个权限的检查
      */
     private void askSinglePermission() {
-        PermissionManager.with(MainActivity.this)
-                .key(9000)
+        PermissionManager.with(getActivity())
+                .key(900)
                 .permission(PermissionEnum.WRITE_EXTERNAL_STORAGE)
                 .askagain(true)
                 .askagainCallback(new AskagainCallback() {
@@ -89,12 +93,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     @Override
                     public void deniedSetting(ArrayList<PermissionEnum> permissionsDenied) {
-                        PermissionHelper.openApplicationSettings(MainActivity.this, R.class.getPackage().getName());
+                        PermissionHelper.openApplicationSettings(mContext, R.class.getPackage().getName());
                     }
 
                     @Override
                     public void deniedCancle(ArrayList<PermissionEnum> permissionsDenied) {
-                        finish();
+                        Toast.makeText(mContext, "权限被取消了", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .ask();
@@ -104,8 +108,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 多个权限的检查
      */
     private void askMultiPermission() {
-        PermissionManager.with(MainActivity.this)
-                .key(800)
+        PermissionManager.with(getActivity())
+                .key(801)
                 .permission(PermissionEnum.GET_ACCOUNTS, PermissionEnum.ACCESS_FINE_LOCATION, PermissionEnum.READ_SMS)
                 .askagain(true)
                 .askagainCallback(new AskagainCallback() {
@@ -122,12 +126,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     @Override
                     public void deniedSetting(ArrayList<PermissionEnum> permissionsDenied) {
-                        PermissionHelper.openApplicationSettings(MainActivity.this, R.class.getPackage().getName());
+                        PermissionHelper.openApplicationSettings(mContext, R.class.getPackage().getName());
                     }
 
                     @Override
                     public void deniedCancle(ArrayList<PermissionEnum> permissionsDenied) {
-                        finish();
+                        Toast.makeText(mContext, "权限被取消了", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .ask();
@@ -135,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void showDialog(final AskagainCallback.UserResponse response) {
-        new AlertDialog.Builder(MainActivity.this)
+        new AlertDialog.Builder(mContext)
                 .setTitle("请求权限")
                 .setMessage("需要调用系统权限，否则APP部分功能无法使用")
                 .setPositiveButton("是", new DialogInterface.OnClickListener() {
@@ -151,23 +155,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 })
                 .show();
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_fragment:
-                startActivity(new Intent(MainActivity.this, SampleFragmentActivity.class));
-                break;
-        }
-        return super.onOptionsItemSelected(item);
     }
 }
