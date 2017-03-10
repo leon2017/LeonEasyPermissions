@@ -14,71 +14,62 @@ android6.0权限请求工具类的简单封装
 
 ## 部分代码 ##
 
-     /**
-     * 单个权限的检查
-     */
-    private void askSinglePermission() {
-        PermissionManager.with(MainActivity.this)
-                .key(9000)
-                .permission(PermissionEnum.WRITE_EXTERNAL_STORAGE)
-                .askagain(true)
-                .askagainCallback(new AskagainCallback() {
-                    @Override
-                    public void showRequestPermission(UserResponse response) {
-                        showDialog(response);
-                    }
-                })
-                .callback(new FullCallback() {
-                    @Override
-                    public void grated(ArrayList<PermissionEnum> permissionsGranted) {
-                        Toast.makeText(mContext, "权限被允许了", Toast.LENGTH_SHORT).show();
-                    }
+      /**
+          * 权限检查
+          */
+         private void checkPermissions() {
+             PermissionManager
+                     .with(MainActivity.this)
+                     .tag(1000)
+                     .permission(PermissionEnum.READ_EXTERNAL_STORAGE, PermissionEnum.WRITE_EXTERNAL_STORAGE, PermissionEnum.CAMERA)
+                     .callback(new PerimissionsCallback() {
+                         @Override
+                         public void onGranted(ArrayList<PermissionEnum> grantedList) {
+                             Toast.makeText(mContext, "权限被允许", Toast.LENGTH_SHORT).show();
+                         }
 
-                    @Override
-                    public void deniedSetting(ArrayList<PermissionEnum> permissionsDenied) {
-                        PermissionHelper.openApplicationSettings(MainActivity.this, R.class.getPackage().getName());
-                    }
+                         @Override
+                         public void onDenied(ArrayList<PermissionEnum> deniedList) {
+                             Toast.makeText(mContext, "权限被拒绝", Toast.LENGTH_SHORT).show();
+                             PermissionDenied(deniedList);
+                         }
+                     })
+                     .checkAsk();
+         }
 
-                    @Override
-                    public void deniedCancle(ArrayList<PermissionEnum> permissionsDenied) {
-                        finish();
-                    }
-                })
-                .ask();
-    }
+         private void PermissionDenied(final ArrayList<PermissionEnum> permissionsDenied) {
+             StringBuilder msgCN = new StringBuilder();
+             for (int i = 0; i < permissionsDenied.size(); i++) {
+
+                 if (i == permissionsDenied.size() - 1) {
+                     msgCN.append(permissionsDenied.get(i).getName_cn());
+                 } else {
+                     msgCN.append(permissionsDenied.get(i).getName_cn() + ",");
+                 }
+             }
+             if (mContext == null) {
+                 return;
+             }
+
+             AlertDialog alertDialog = new AlertDialog.Builder(mContext)
+                     .setMessage(String.format(mContext.getResources().getString(R.string.permission_explain), msgCN.toString()))
+                     .setCancelable(false)
+                     .setPositiveButton(R.string.per_setting, new DialogInterface.OnClickListener() {
+                         @Override
+                         public void onClick(DialogInterface dialog, int which) {
+                             PerUtils.openApplicationSettings(mContext, R.class.getPackage().getName());
+                         }
+                     })
+                     .setNegativeButton(R.string.per_cancle, new DialogInterface.OnClickListener() {
+                         @Override
+                         public void onClick(DialogInterface dialog, int which) {
+                             Toast.makeText(mContext, "点击了取消", Toast.LENGTH_SHORT).show();
+                         }
+                     }).create();
+             alertDialog.show();
+         }
 
 
----
 
-    /**
-     * 多个权限的检查
-     */
-    private void askMtutiPermission() {
-        PermissionManager.with(MainActivity.this)
-                .key(800)
-                .permission(PermissionEnum.GET_ACCOUNTS, PermissionEnum.ACCESS_FINE_LOCATION, PermissionEnum.READ_SMS)
-                .askagain(true)
-                .askagainCallback(new AskagainCallback() {
-                    @Override
-                    public void showRequestPermission(UserResponse response) {
-                        showDialog(response);
-                    }
-                })
-                .callback(new FullCallback() {
-                    @Override
-                    public void grated(ArrayList<PermissionEnum> permissionsGranted) {
-                        Toast.makeText(mContext, "权限被允许了", Toast.LENGTH_SHORT).show();
-                    }
 
-                    @Override
-                    public void deniedSetting(ArrayList<PermissionEnum> permissionsDenied) {
-                        PermissionHelper.openApplicationSettings(MainActivity.this, R.class.getPackage().getName());
-                    }
 
-                    @Override
-                    public void deniedCancle(ArrayList<PermissionEnum> permissionsDenied) {
-                        finish();
-                    }
-                })
-                .ask();
-    }

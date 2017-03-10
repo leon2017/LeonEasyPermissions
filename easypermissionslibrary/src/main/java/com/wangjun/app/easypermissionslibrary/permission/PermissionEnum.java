@@ -5,11 +5,17 @@ import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 
 /**
+ * 当前类注释：危险权限枚举
  * Author :LeonWang
- * Created  2016/11/8.14:30
+ * <p>
+ * Created  2017/3/9.16:26
+ * <p>
  * Description:
+ * <p>
  * E-mail:lijiawangjun@gmail.com
  */
+
+
 @SuppressLint("InlinedApi")
 public enum PermissionEnum {
 
@@ -48,30 +54,34 @@ public enum PermissionEnum {
     GROUP_SMS(Manifest.permission_group.SMS,"短信"),
     GROUP_STORAGE(Manifest.permission_group.STORAGE,"内存卡");
 
-    private final String permission;
+    private final String permisson;
     private String name_cn;
 
-    PermissionEnum(String permission,String name_cn) {
-        this.permission = permission;
+    PermissionEnum(String permisson, String name_cn) {
+        this.permisson = permisson;
         this.name_cn = name_cn;
     }
 
-    public static PermissionEnum fromManifestPermission(@NonNull String value) {
+
+    /**
+     * 对请求权限的响应遍历
+     * @param value
+     * @return
+     */
+    public static PermissionEnum onResultPermissions(@NonNull String value) {
         for (PermissionEnum permissionEnum : PermissionEnum.values()) {
-            if (value.equalsIgnoreCase(permissionEnum.permission)) {
+            if (value.equalsIgnoreCase(permissionEnum.permisson)) {
                 return permissionEnum;
             }
         }
         return null;
     }
 
-    public String getName_cn(){
+    public String getPermisson() {
+        return permisson;
+    }
+
+    public String getName_cn() {
         return name_cn;
     }
-
-    @Override
-    public String toString() {
-        return permission;
-    }
-
 }
