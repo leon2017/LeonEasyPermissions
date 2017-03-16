@@ -84,11 +84,19 @@ public class PermissionManager {
             String[] permissionToAsk = permissionToAsk();
             if (permissionToAsk.length == 0) {
                 showResult();
-            } else {
-                // TODO: 2017/3/9 检查权限---此处尚有一个bug
-                // TODO: 2017/3/9  e.g.     ActivityCompat.shouldShowRequestPermissionRationale((Activity) mContext,
-                // TODO: 2017/3/9  Manifest.permission.READ_PHONE_STATE)
-                ActivityCompat.requestPermissions((Activity) mContext, permissionToAsk, mTag);
+            } else {//权限不明
+                for (int i = 0; i < permissionToAsk.length; i++) {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) mContext, permissionToAsk[i])) {
+                        mPermissionsDenied.add(PermissionEnum.onResultPermissions(permissionToAsk[i]));
+                    }
+                }
+                // TODO: 2017/3/16 修复部分bug
+                //权限已经被拒绝
+                if (mPermissionsDenied.size() != 0) {
+                    showResult();
+                } else {//权限没有被拒绝 直接申请
+                    ActivityCompat.requestPermissions((Activity)mContext,permissionToAsk,mTag);
+                }
             }
         } else {
             initArrayList();
