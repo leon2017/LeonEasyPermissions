@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 //apply plugin: 'com.jfrog.bintray'
 
-def supportVersion="25.2.0"
+def supportVersion = "25.2.0"
 
 android {
     compileSdkVersion 25
@@ -28,6 +28,9 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile "com.android.support:appcompat-v7:$supportVersion"
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
+    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
     testCompile 'junit:junit:4.12'
     compile project(':easypermissionslibrary')
 }

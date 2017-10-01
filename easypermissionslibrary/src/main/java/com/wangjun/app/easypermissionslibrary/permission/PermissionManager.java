@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -25,12 +26,16 @@ import java.util.Collections;
 
 public class PermissionManager {
 
-    private Context mContext;
-    private PerimissionsCallback  mPerimissionsCallback;
+    private PerimissionsCallback mPerimissionsCallback;
     private ArrayList<PermissionEnum> mPermissions;
     private ArrayList<PermissionEnum> mPermissionsGranted;
     private ArrayList<PermissionEnum> mPermissionsDenied;
     private int mTag = 100;
+    private static WeakReference<Context> contextWeakReference;
+
+    private static class PermissionManagerHolder {
+        private static final PermissionManager INSTANCE = new PermissionManager();
+    }
 
     private PermissionManager() {
     }
@@ -38,17 +43,14 @@ public class PermissionManager {
     private static PermissionManager _instance;
 
     public static PermissionManager with(Context context) {
-        if (_instance == null) {
-            _instance = new PermissionManager();
-        }
-        _instance.init(context);
+        contextWeakReference = new WeakReference<>(context);
+        _instance = PermissionManagerHolder.INSTANCE;
         return _instance;
     }
 
-    private void init(Context context) {
-        mContext = context;
+    private Context getContext() {
+       return contextWeakReference.get();
     }
-
 
     public static void handleResult(int requestCode,
                                     @NonNull String[] permissions,
@@ -67,6 +69,7 @@ public class PermissionManager {
         }
 
     }
+
     /**
      * 权限请求的返回状态区分
      *
@@ -86,7 +89,7 @@ public class PermissionManager {
                 showResult();
             } else {//权限不明
                 for (int i = 0; i < permissionToAsk.length; i++) {
-                    if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) mContext, permissionToAsk[i])) {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) getContext(), permissionToAsk[i])) {
                         mPermissionsDenied.add(PermissionEnum.onResultPermissions(permissionToAsk[i]));
                     }
                 }
@@ -95,7 +98,7 @@ public class PermissionManager {
                 if (mPermissionsDenied.size() != 0) {
                     showResult();
                 } else {//权限没有被拒绝 直接申请
-                    ActivityCompat.requestPermissions((Activity)mContext,permissionToAsk,mTag);
+                    ActivityCompat.requestPermissions((Activity) getContext(), permissionToAsk, mTag);
                 }
             }
         } else {
@@ -152,6 +155,7 @@ public class PermissionManager {
 
     /**
      * 检查是否拥有权限
+     *
      * @return permission that you realy need to ask
      */
     @NonNull
@@ -169,7 +173,7 @@ public class PermissionManager {
 
     private boolean isGranted(PermissionEnum permission) {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-                ContextCompat.checkSelfPermission(mContext, permission.getPermisson()) == PackageManager.PERMISSION_GRANTED;
+                ContextCompat.checkSelfPermission(getContext(), permission.getPermisson()) == PackageManager.PERMISSION_GRANTED;
     }
 
     private boolean isGranted(Context context, PermissionEnum... permission) {
