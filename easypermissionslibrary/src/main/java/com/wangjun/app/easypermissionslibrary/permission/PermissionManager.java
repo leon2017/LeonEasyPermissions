@@ -40,34 +40,28 @@ public class PermissionManager {
     private PermissionManager() {
     }
 
-    private static PermissionManager _instance;
-
     public static PermissionManager with(Context context) {
         contextWeakReference = new WeakReference<>(context);
-        _instance = PermissionManagerHolder.INSTANCE;
-        return _instance;
+        return PermissionManagerHolder.INSTANCE;
     }
 
     private Context getContext() {
        return contextWeakReference.get();
     }
 
-    public static void handleResult(int requestCode,
+    public void handleResult(int requestCode,
                                     @NonNull String[] permissions,
                                     @NonNull int[] grantResults) {
-
-        if (_instance == null) return;
-        if (requestCode == _instance.mTag) {
+        if (requestCode == this.mTag) {
             for (int i = 0; i < permissions.length; i++) {
                 if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                    _instance.mPermissionsGranted.add(PermissionEnum.onResultPermissions(permissions[i]));
+                    this.mPermissionsGranted.add(PermissionEnum.onResultPermissions(permissions[i]));
                 } else {
-                    _instance.mPermissionsDenied.add(PermissionEnum.onResultPermissions(permissions[i]));
+                    this.mPermissionsDenied.add(PermissionEnum.onResultPermissions(permissions[i]));
                 }
             }
-            _instance.showResult();
+            this.showResult();
         }
-
     }
 
     /**
@@ -194,6 +188,4 @@ public class PermissionManager {
             }
         }
     }
-
-
 }
